@@ -35,6 +35,10 @@ module Lita
               wait
               result = ChatWork::Message.get(room_id: r["room_id"])
               next if result.is_a?(ChatWork::APIError) and result.message == "204"
+              if result.message == "429"
+                @logger.error "Too Many Requests Error result: #{result} (#{result.message})"
+                break
+              end
               result.each do |m|
                 next if m["account"]["account_id"] == @me["account_id"]
                 user = Lita::User.find_by_id(m["account"]["account_id"])
