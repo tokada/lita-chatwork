@@ -24,17 +24,17 @@ module Lita
           loop do
             wait
             result = ChatWork::Room.get
+
             if result.is_a?(ChatWork::APIError)
               @logger.error "ChatWork::Room.get result: #{result} (#{result.message})"
               break
             end
 
-            joined_rooms = result.select{|r| r["sticky"] }
-            unread_rooms = result.select{|r| r["unread_num"] > 0 }
-            (joined_rooms | unread_rooms).each do |r|
+            rooms = result.select{|r| r["sticky"] == false && r["unread_num"] > 0 } || []
+            rooms.each do |r|
               wait
               result = ChatWork::Message.get(room_id: r["room_id"])
-              next if result.is_a?(ChatWork::APIError) and result.message == "204"
+              next if result.is_a?(ChatWork::APIError)
               result.each do |m|
                 next if m["account"]["account_id"] == @me["account_id"]
                 user = Lita::User.find_by_id(m["account"]["account_id"])
