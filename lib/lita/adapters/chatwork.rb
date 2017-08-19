@@ -5,7 +5,7 @@ module Lita
   module Adapters
     class Chatwork < Adapter
       config :api_key, type: String, required: true
-      config :interval, type: Fixnum, default: 5
+      config :interval, type: Integer, default: 5
       config :with_reply, default: true # whether to include [rp] tag in reply message
       config :debug, default: false
 
